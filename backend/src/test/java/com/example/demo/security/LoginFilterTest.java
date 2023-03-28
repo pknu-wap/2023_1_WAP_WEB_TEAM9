@@ -1,5 +1,8 @@
 package com.example.demo.security;
 
+import static com.example.demo.security.TestMemberConstant.LOGIN_ID;
+import static com.example.demo.security.TestMemberConstant.NICKNAME;
+import static com.example.demo.security.TestMemberConstant.PASSWORD;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -8,7 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.example.demo.config.WebSecurityConfig;
 import com.example.demo.domain.member.Member;
 import com.example.demo.domain.member.Role;
 import com.example.demo.domain.member.dto.LoginRequest;
@@ -21,21 +23,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-@Import(WebSecurityConfig.class)
-@WebMvcTest
+@SpringBootTest
 class LoginFilterTest {
-
-    private static final String LOGIN_ID = "tester12345";
-    private static final String PASSWORD = "12345678";
-    private static final String NICKNAME = "tester";
 
     @MockBean
     private MemberDetailsService memberDetailsService;
