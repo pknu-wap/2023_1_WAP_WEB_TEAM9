@@ -4,6 +4,7 @@ import com.example.demo.security.AuthenticationTokenFilter;
 import com.example.demo.security.AuthenticationTokenProvider;
 import com.example.demo.security.LoginFilter;
 import com.example.demo.security.LoginSuccessHandler;
+import com.example.demo.security.MemberDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +22,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final AuthenticationTokenProvider tokenProvider;
+    private final MemberDetailsService memberDetailsService;
 
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
@@ -30,6 +33,11 @@ public class WebSecurityConfig {
     @Bean
     public LoginSuccessHandler loginSuccessHandler() {
         return new LoginSuccessHandler();
+    }
+
+    @Bean
+    public AuthenticationTokenFilter jwtFilter() {
+        return new AuthenticationTokenFilter(tokenProvider, memberDetailsService);
     }
 
     @Bean
@@ -57,7 +65,8 @@ public class WebSecurityConfig {
             .antMatchers("/api/members/**").hasAnyRole("USER", "ADMIN")
             .anyRequest().permitAll()
             .and()
-            .addFilterAt(loginFilter(), UsernamePasswordAuthenticationFilter.class);
+            .addFilterAt(loginFilter(), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }
