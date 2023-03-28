@@ -54,7 +54,7 @@ class LoginFilterTest {
             .loginId(LOGIN_ID)
             .nickname(NICKNAME)
             .password(passwordEncoder.encode(PASSWORD))
-            .role(Role.USER)
+            .role(Role.ROLE_USER)
             .build();
         request = new LoginRequest(LOGIN_ID, PASSWORD);
         objectMapper = new ObjectMapper();

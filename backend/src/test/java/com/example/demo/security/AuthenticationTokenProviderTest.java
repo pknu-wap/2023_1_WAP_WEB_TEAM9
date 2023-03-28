@@ -41,7 +41,7 @@ class AuthenticationTokenProviderTest {
             .loginId("tester12345")
             .nickname("tester")
             .password("12345678")
-            .role(Role.USER)
+            .role(Role.ROLE_USER)
             .build();
 
         accessToken = Jwts.builder()
