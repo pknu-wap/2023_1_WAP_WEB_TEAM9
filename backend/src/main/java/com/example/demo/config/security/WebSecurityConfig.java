@@ -1,4 +1,4 @@
-package com.example.demo.config;
+package com.example.demo.config.security;
 
 import com.example.demo.security.LoginFilter;
 import com.example.demo.security.LoginSuccessHandler;
