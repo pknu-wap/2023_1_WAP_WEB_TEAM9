@@ -1,5 +1,7 @@
 package com.example.demo.config.security;
 
+import com.example.demo.security.AuthenticationTokenFilter;
+import com.example.demo.security.AuthenticationTokenProvider;
 import com.example.demo.security.LoginFilter;
 import com.example.demo.security.LoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +54,7 @@ public class WebSecurityConfig {
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .authorizeRequests()
+            .antMatchers("/api/members/**").hasAnyRole("USER", "ADMIN")
             .anyRequest().permitAll()
             .and()
             .addFilterAt(loginFilter(), UsernamePasswordAuthenticationFilter.class);
