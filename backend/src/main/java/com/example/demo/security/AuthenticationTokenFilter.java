@@ -6,6 +6,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+@Slf4j
 @RequiredArgsConstructor
 public class AuthenticationTokenFilter extends OncePerRequestFilter {
 
@@ -25,8 +27,17 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException {
 
-        String token = getToken(request);
+        try {
+            authenticate(request);
+        } catch (Exception e) {
+            log.error("error={}", e.getClass());
+        }
 
+        filterChain.doFilter(request, response);
+    }
+
+    private void authenticate(HttpServletRequest request) {
+        String token = getToken(request);
         if (StringUtils.hasText(token) && tokenProvider.validateAccessToken(token)) {
             String username = tokenProvider.getAttribute(token);
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -35,8 +46,6 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
                     userDetails.getPassword(),
                     userDetails.getAuthorities()));
         }
-
-        filterChain.doFilter(request, response);
     }
 
     private String getToken(HttpServletRequest request) {
