@@ -4,9 +4,9 @@ import com.example.demo.domain.board.Board;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
@@ -24,6 +24,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Builder
 @Getter
@@ -31,6 +35,7 @@ import org.hibernate.validator.constraints.Length;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class Member {
 
     @Id
@@ -59,12 +64,19 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private State state;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", orphanRemoval = true)
     @Builder.Default
     private List<Board> boards = new ArrayList<>();
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm")
+    @CreatedDate
     private LocalDateTime createAt;
+
+    @LastModifiedDate
+    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm")
     private LocalDateTime updateAt;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm")
     private LocalDateTime deleteAt;
 
     public void addBoard(Board board) {
