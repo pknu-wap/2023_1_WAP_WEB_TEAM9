@@ -49,6 +49,7 @@ public class PerformanceTest {
             .password(PASSWORD)
             .nickname(NICKNAME)
             .build();
+        memberRepository.save(member);
         // 스프링에서 트랜잭션 기본 전파 옵션은 REQUIRES, 즉 부모 트랜잭션이 있으면 트랜잭션을 만들지 않는다.
         // Test 클래스에 트랜잭션이 걸려있으므로 서비스 계층의 자식 트랜잭션은 실행되지 않게 된다.
         transaction.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
@@ -61,11 +62,11 @@ public class PerformanceTest {
         saveManyBoardsAndMembers();
 
         em.clear();
-        List<Member> members = memberRepository.findAll();
+        List<Member> members = memberRepository.findAllByJPQL();
         // 만약 n + 1 문제가 해결되지 못한다면 해당 코드에 select가 여러번 진행
         members.forEach(tester -> tester.getBoards().size());
 
-        assertThat(members.size()).isEqualTo(10);
+        assertThat(members.size()).isEqualTo(11);
     }
 
     private void saveManyBoardsAndMembers() {
