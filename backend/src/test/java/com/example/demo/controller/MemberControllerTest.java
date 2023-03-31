@@ -1,12 +1,10 @@
 package com.example.demo.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.example.demo.common.WithCustomMember;
-import com.example.demo.config.WebConfig;
 import com.example.demo.config.security.AuthProperties;
 import com.example.demo.config.security.WebSecurityConfig;
 import com.example.demo.security.AuthenticationTokenProvider;
@@ -42,11 +40,11 @@ class MemberControllerTest {
     void init(WebApplicationContext context) {
         mvc = MockMvcBuilders
             .webAppContextSetup(context)
+            .apply(springSecurity())
             .build();
     }
 
     @Test
-    @WithCustomMember
     void test() throws Exception {
         mvc.perform(get("/api/members")
             .contentType(MediaType.APPLICATION_JSON))
