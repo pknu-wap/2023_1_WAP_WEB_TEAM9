@@ -8,6 +8,7 @@ import com.example.demo.security.MemberAuthenticationEntryPoint;
 import com.example.demo.security.MemberDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -69,7 +70,13 @@ public class WebSecurityConfig {
             .authenticationEntryPoint(authenticationEntryPoint)
             .and()
             .authorizeRequests()
-            .antMatchers( "/api/board/**")
+            .antMatchers(HttpMethod.GET ,"/api/board/**")
+            .permitAll()
+            .antMatchers(HttpMethod.POST, "/api/board/**")
+            .hasAnyRole("USER", "ADMIN")
+            .antMatchers(HttpMethod.PATCH, "/api/board/**")
+            .hasAnyRole("USER", "ADMIN")
+            .antMatchers(HttpMethod.DELETE, "/api/board/**")
             .hasAnyRole("USER", "ADMIN")
             .anyRequest().permitAll()
             .and()
