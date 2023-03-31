@@ -65,7 +65,7 @@ class AuthenticationTokenFilterTest {
     @Test
     void permissionTest() throws Exception {
         mvc.perform(get("/api/members"))
-            .andExpect(status().isForbidden());
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -86,7 +86,7 @@ class AuthenticationTokenFilterTest {
         mvc.perform(get("/api/members")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(AUTHORIZATION, BEARER + expiredToken))
-            .andExpect(status().isForbidden())
+            .andExpect(status().isUnauthorized())
             .andDo(print());
         verify(memberDetailsService, never()).loadUserByUsername(anyString());
     }

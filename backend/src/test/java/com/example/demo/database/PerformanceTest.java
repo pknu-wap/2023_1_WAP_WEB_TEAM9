@@ -15,6 +15,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,7 +50,6 @@ public class PerformanceTest {
             .password(PASSWORD)
             .nickname(NICKNAME)
             .build();
-        memberRepository.save(member);
         // 스프링에서 트랜잭션 기본 전파 옵션은 REQUIRES, 즉 부모 트랜잭션이 있으면 트랜잭션을 만들지 않는다.
         // Test 클래스에 트랜잭션이 걸려있으므로 서비스 계층의 자식 트랜잭션은 실행되지 않게 된다.
         transaction.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
@@ -66,23 +66,7 @@ public class PerformanceTest {
         // 만약 n + 1 문제가 해결되지 못한다면 해당 코드에 select가 여러번 진행
         members.forEach(tester -> tester.getBoards().size());
 
-        assertThat(members.size()).isEqualTo(11);
-    }
-
-    private void saveManyBoardsAndMembers() {
-        for (int i = 0; i < 10; i++) {
-            Member memberA = Member.builder()
-                .loginId("testerAA" + i)
-                .password("1111111" + i)
-                .nickname("tester" + i)
-                .build();
-            memberRepository.save(memberA);
-            BoardRequest request = BoardRequest.builder()
-                .title("title" + i)
-                .content("content" + i)
-                .build();
-            boardService.register(memberA, request);
-        }
+        assertThat(members.size()).isEqualTo(10);
     }
 
     @DisplayName("게시판에 락을 걸어 여러 쓰레드가 동시에 접근해도 조회수가 제대로 증가한다.")
@@ -110,5 +94,21 @@ public class PerformanceTest {
 
         Board board1 = boardService.getBoard(board.getId());
         assertThat(board1.getViews()).isEqualTo(numberOfThread + 1);
+    }
+
+    private void saveManyBoardsAndMembers() {
+        for (int i = 0; i < 10; i++) {
+            Member memberA = Member.builder()
+                .loginId("testerAA" + i)
+                .password("1111111" + i)
+                .nickname("tester" + i)
+                .build();
+            memberRepository.save(memberA);
+            BoardRequest request = BoardRequest.builder()
+                .title("title" + i)
+                .content("content" + i)
+                .build();
+            boardService.register(memberA, request);
+        }
     }
 }
