@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.example.demo.common.WithCustomMember;
 import com.example.demo.config.security.AuthProperties;
 import com.example.demo.config.security.WebSecurityConfig;
 import com.example.demo.security.AuthenticationTokenProvider;
@@ -45,6 +46,7 @@ class MemberControllerTest {
     }
 
     @Test
+    @WithCustomMember
     void test() throws Exception {
         mvc.perform(get("/api/members")
             .contentType(MediaType.APPLICATION_JSON))
