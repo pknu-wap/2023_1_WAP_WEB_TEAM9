@@ -14,8 +14,6 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @Component
 public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolver {
 
-    public static final String ANONYMOUS_USER = "anonymousUser";
-
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         return parameter.getParameterType().isAssignableFrom(Member.class)
@@ -41,6 +39,6 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
     }
 
     private boolean isAnonymousUser(Authentication authentication) {
-        return authentication.getPrincipal().equals(ANONYMOUS_USER);
+        return authentication.getPrincipal().getClass() == String.class;
     }
 }
