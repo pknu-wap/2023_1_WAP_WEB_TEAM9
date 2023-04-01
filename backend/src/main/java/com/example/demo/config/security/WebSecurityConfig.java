@@ -37,7 +37,7 @@ public class WebSecurityConfig {
 
     @Bean
     public LoginSuccessHandler loginSuccessHandler() {
-        return new LoginSuccessHandler();
+        return new LoginSuccessHandler(tokenProvider);
     }
 
     @Bean

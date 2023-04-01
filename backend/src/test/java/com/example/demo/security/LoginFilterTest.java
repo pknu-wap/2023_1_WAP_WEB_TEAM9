@@ -8,13 +8,18 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.example.demo.config.security.AuthProperties;
+import com.example.demo.config.security.WebSecurityConfig;
+import com.example.demo.controller.MemberController;
 import com.example.demo.domain.member.Member;
 import com.example.demo.domain.member.Role;
 import com.example.demo.domain.member.dto.LoginRequest;
+import com.example.demo.repository.MemberRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Optional;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,21 +27,23 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-@SpringBootTest
+@Import({WebSecurityConfig.class, AuthProperties.class})
+@ComponentScan(basePackages = "com.example.demo.security")
+@WebMvcTest(MemberController.class)
 class LoginFilterTest {
 
     @MockBean
-    private MemberDetailsService memberDetailsService;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private MemberRepository memberRepository;
 
     private MockMvc mvc;
     private LoginRequest request;
@@ -45,6 +52,7 @@ class LoginFilterTest {
 
     @BeforeEach
     void init(WebApplicationContext context) {
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         mvc = MockMvcBuilders
             .webAppContextSetup(context)
             .apply(springSecurity())
@@ -63,11 +71,11 @@ class LoginFilterTest {
     @DisplayName("올바른 아이디 비밀번호를 입력하면 로그인이 성공한다.")
     @Test
     void login() throws Exception {
-        given(memberDetailsService.loadUserByUsername(anyString())).willReturn(MemberDetails.create(member));
+        given(memberRepository.findMemberByLoginId(anyString())).willReturn(Optional.of(member));
         mvc.perform(post("/api/auth/login")
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("code").value(LOGIN_ID))
+            .andExpect(header().exists("Authorization"))
             .andDo(print());
     }
 
@@ -75,7 +83,7 @@ class LoginFilterTest {
     @MethodSource("failLoginRequests")
     @ParameterizedTest
     void inputFailLoginRequest(LoginRequest failRequest) throws Exception {
-        given(memberDetailsService.loadUserByUsername(anyString())).willReturn(MemberDetails.create(member));
+        given(memberRepository.findMemberByLoginId(anyString())).willReturn(Optional.of(member));
         mvc.perform(post("/api/auth/login")
                 .content(objectMapper.writeValueAsString(failRequest)))
             .andExpect(status().isUnauthorized())
