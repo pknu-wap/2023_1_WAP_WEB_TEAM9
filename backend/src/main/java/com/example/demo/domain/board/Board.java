@@ -1,7 +1,9 @@
 package com.example.demo.domain.board;
 
+import com.example.demo.domain.comment.Comment;
 import com.example.demo.domain.member.Member;
 import java.time.LocalDateTime;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
@@ -10,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,6 +46,9 @@ public class Board {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "board")
+    private List<Comment> comments;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm")
     @CreatedDate
