@@ -6,9 +6,13 @@ import static org.junit.jupiter.api.Assumptions.assumingThat;
 
 import com.example.demo.config.JpaAuditingConfig;
 import com.example.demo.domain.board.dto.BoardRequest;
+import com.example.demo.domain.tag.BoardTag;
+import com.example.demo.domain.tag.Tag;
 import com.example.demo.repository.BoardRepository;
+import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -26,14 +30,23 @@ class BoardTest {
 
     private BoardRequest request;
 
+    private Board board;
+
     @BeforeEach
     void init() {
+        board = Board.builder()
+            .title("안녕하세요")
+            .content("게시물 입니다.")
+            .views(0L)
+            .build();
+
         request = BoardRequest.builder()
             .title("test")
             .content("hello")
             .build();
     }
 
+    @DisplayName("요청을 받아 게시판을 생성한다.")
     @Test
     void toBoard() {
         Board board = boardRepository.save(request.toBoard());
@@ -45,6 +58,7 @@ class BoardTest {
         System.out.println("board.getCreateAt() = " + board.getCreateAt());
     }
 
+    @DisplayName("게시판 조회시 조회수가 증가한다.")
     @Test
     void increaseView() {
         Board board = request.toBoard();
@@ -55,6 +69,7 @@ class BoardTest {
         assertThat(board.getViews()).isEqualTo(1L);
     }
 
+    @DisplayName("게시판을 요청에 따라서 업데이트한다.")
     @MethodSource("generateBoardValues")
     @ParameterizedTest
     void update(BoardRequest updateRequest) {
@@ -69,6 +84,36 @@ class BoardTest {
                 () -> assertThat(updateRequest.getTitle()).isEqualTo(board.getTitle())),
             () -> assertThat(board.getUpdateAt()).isNotNull()
         );
+    }
+
+    @DisplayName("게시판에 해시태그를 추가해서 내용을 확인")
+    @Test
+    void addBoardTag() {
+        Tag tag1 = Tag.builder()
+            .id(1L)
+            .name("인생")
+            .build();
+
+        Tag tag2 = Tag.builder()
+            .id(2L)
+            .name("돈")
+            .build();
+
+        BoardTag boardTag1 = BoardTag.associate(board, tag1);
+        BoardTag boardTag2 = BoardTag.associate(board, tag2);
+
+        List<BoardTag> boardTags = board.getBoardTags();
+        assertThat(boardTags.stream().map(BoardTag::getTag).map(Tag::getName))
+            .containsExactly("인생", "돈");
+    }
+
+    @DisplayName("게시판의 태그를 삭제한다.")
+    @Test
+    void deleteBoardTag() {
+        BoardTag boardTag = BoardTag.associate(board, new Tag(1L, "인생"));
+        board.deleteBoardTag(boardTag);
+
+        assertThat(board.getBoardTags()).isEmpty();
     }
 
     private static Stream<Arguments> generateBoardValues() {
