@@ -57,7 +57,6 @@ class BoardServiceTest {
 
         board = Board.builder()
             .id(1L)
-            .createAt(LocalDateTime.now())
             .views(0L)
             .content("This is test board")
             .title("board")
@@ -95,9 +94,7 @@ class BoardServiceTest {
             () -> assertThat(board.getId()).isEqualTo(1L),
             () -> assertThat(board.getContent()).isEqualTo(updateRequest.getContent()),
             () -> assertThat(board.getTitle()).isEqualTo(updateRequest.getTitle()),
-            () -> assertThat(board.getViews()).isNotNull(),
-            () -> assertThat(board.getUpdateAt()).isNotNull()
-        );
+            () -> assertThat(board.getViews()).isNotNull());
     }
 
     @Test

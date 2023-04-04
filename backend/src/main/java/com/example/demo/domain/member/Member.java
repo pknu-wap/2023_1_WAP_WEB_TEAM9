@@ -1,5 +1,6 @@
 package com.example.demo.domain.member;
 
+import com.example.demo.domain.BaseTimeEntity;
 import com.example.demo.domain.board.Board;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,8 +36,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
-public class Member {
+public class Member extends BaseTimeEntity {
 
     @Id
     @Column(name = "MEMBER_ID")
@@ -67,17 +67,6 @@ public class Member {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", orphanRemoval = true)
     @Builder.Default
     private List<Board> boards = new ArrayList<>();
-
-    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm")
-    @CreatedDate
-    private LocalDateTime createAt;
-
-    @LastModifiedDate
-    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm")
-    private LocalDateTime updateAt;
-
-    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm")
-    private LocalDateTime deleteAt;
 
     public void addBoard(Board board) {
         boards.add(board);

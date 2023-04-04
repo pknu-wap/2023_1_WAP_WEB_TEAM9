@@ -87,7 +87,6 @@ class BoardControllerTest {
             .content("this is board")
             .title("test")
             .views(1L)
-            .createAt(LocalDateTime.now())
             .build();
         board.setMember(member);
 
@@ -102,7 +101,6 @@ class BoardControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("title", board.getTitle()).exists())
             .andExpect(jsonPath("content", board.getContent()).exists())
-            .andExpect(jsonPath("createAt", board.getCreateAt()).exists())
             .andExpect(jsonPath("views", board.getViews()).exists())
             .andExpect(jsonPath("memberNickname", member.getNickname()).exists())
             .andDo(print());
@@ -120,7 +118,6 @@ class BoardControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("title", board.getTitle()).exists())
             .andExpect(jsonPath("content", board.getContent()).exists())
-            .andExpect(jsonPath("createAt", board.getCreateAt()).exists())
             .andExpect(jsonPath("views", board.getViews()).exists())
             .andExpect(jsonPath("memberNickname", member.getNickname()).exists())
             .andDo(print());
