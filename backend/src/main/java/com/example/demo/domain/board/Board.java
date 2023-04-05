@@ -41,7 +41,7 @@ public class Board extends BaseTimeEntity {
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "board", orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "board", orphanRemoval = true)
     @Builder.Default
     private List<BoardTag> boardTags = new ArrayList<>();
 
