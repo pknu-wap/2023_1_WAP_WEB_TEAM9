@@ -21,13 +21,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.reactive.server.WebTestClient.Builder;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 @Transactional
 @SpringBootTest
-public class PerformanceTest {
+class PerformanceTest {
 
     @Autowired
     private MemberRepository memberRepository;
@@ -66,7 +67,7 @@ public class PerformanceTest {
         // 만약 n + 1 문제가 해결되지 못한다면 해당 코드에 select가 여러번 진행
         members.forEach(tester -> tester.getBoards().size());
 
-        assertThat(members.size()).isEqualTo(10);
+        assertThat(members).hasSize(10);
     }
 
     @DisplayName("게시판에 락을 걸어 여러 쓰레드가 동시에 접근해도 조회수가 제대로 증가한다.")
@@ -75,7 +76,7 @@ public class PerformanceTest {
         int numberOfThread = 100;
         CountDownLatch latch = new CountDownLatch(numberOfThread);
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThread);
-        BoardRequest request = new BoardRequest("테스트", "hello");
+        BoardRequest request = BoardRequest.builder().title("테스트").content("hello").build();
         transaction.execute((status -> memberRepository.save(member)));
         Board board = transaction.execute((status) -> boardService.register(member, request));
 
