@@ -3,8 +3,11 @@ package com.example.demo.domain.board;
 import com.example.demo.domain.BaseTimeEntity;
 import com.example.demo.domain.member.Member;
 import com.example.demo.domain.tag.BoardTag;
-import java.util.ArrayList;
-import java.util.List;
+import com.example.demo.domain.tag.Tag;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -43,7 +46,7 @@ public class Board extends BaseTimeEntity {
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "board", orphanRemoval = true)
     @Builder.Default
-    private List<BoardTag> boardTags = new ArrayList<>();
+    private Set<BoardTag> boardTags = new HashSet<>();
 
     public void setMember(Member member) {
         this.member = member;
@@ -70,8 +73,13 @@ public class Board extends BaseTimeEntity {
         this.boardTags.remove(boardTag);
     }
 
-    public void addBoardTags(BoardTag boardTag) {
+    public void addBoardTag(BoardTag boardTag) {
         this.boardTags.add(boardTag);
+    }
+
+    public void addTags(Collection<Tag> tags) {
+        this.boardTags.addAll(tags.stream()
+            .map(tag -> BoardTag.associate(this, tag)).collect(Collectors.toSet()));
     }
 
     public void setViews(Long views) {

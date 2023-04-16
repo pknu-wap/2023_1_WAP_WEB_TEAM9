@@ -10,6 +10,8 @@ import com.example.demo.domain.tag.BoardTag;
 import com.example.demo.domain.tag.Tag;
 import com.example.demo.repository.BoardRepository;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -76,7 +78,6 @@ class BoardTest {
         Board board = boardRepository.save(request.toBoard());
         board.update(updateRequest.toBoard());
 
-
         assertAll(
             () -> assumingThat(updateRequest.getContent() != null,
                 () -> assertThat(updateRequest.getContent()).isEqualTo(board.getContent())),
@@ -89,31 +90,40 @@ class BoardTest {
     @DisplayName("게시판에 해시태그를 추가해서 내용을 확인")
     @Test
     void addBoardTag() {
-        Tag tag1 = Tag.builder()
-            .id(1L)
-            .name("인생")
-            .build();
+        Tag tag1 = Tag.builder().id(1L).name("인생").build();
+        Tag tag2 = Tag.builder().id(2L).name("돈").build();
 
-        Tag tag2 = Tag.builder()
-            .id(2L)
-            .name("돈")
-            .build();
+        BoardTag.associate(board, tag1);
+        BoardTag.associate(board, tag2);
 
-        BoardTag boardTag1 = BoardTag.associate(board, tag1);
-        BoardTag boardTag2 = BoardTag.associate(board, tag2);
-
-        List<BoardTag> boardTags = board.getBoardTags();
+        Set<BoardTag> boardTags = board.getBoardTags();
         assertThat(boardTags.stream().map(BoardTag::getTag).map(Tag::getName))
-            .containsExactly("인생", "돈");
+            .contains("인생", "돈");
     }
 
     @DisplayName("게시판의 태그를 삭제한다.")
     @Test
     void deleteBoardTag() {
-        BoardTag boardTag = BoardTag.associate(board, new Tag(1L, "인생"));
+        Tag tag = new Tag(1L, "인생");
+        BoardTag boardTag = BoardTag.associate(board, tag);
         board.deleteBoardTag(boardTag);
 
         assertThat(board.getBoardTags()).isEmpty();
+    }
+
+    @DisplayName("게시판에 여러 태그를 추가한다.")
+    @Test
+    void addTags() {
+        Tag tag1 = new Tag(1L, "인생");
+        Tag tag2 = new Tag(2L, "돈");
+
+        board.addTags(List.of(tag1, tag2));
+        Set<String> tagNames = board.getBoardTags().stream()
+            .map(BoardTag::getTag)
+            .map(Tag::getName)
+            .collect(Collectors.toSet());
+
+        assertThat(tagNames).contains(tag1.getName(), tag2.getName());
     }
 
     private static Stream<Arguments> generateBoardValues() {

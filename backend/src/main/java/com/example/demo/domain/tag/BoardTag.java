@@ -13,7 +13,6 @@ import javax.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @Entity
@@ -29,7 +28,7 @@ public class BoardTag extends BaseTimeEntity {
     @JoinColumn(name = "BOARD_ID")
     private Board board;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "TAG_ID")
     private Tag tag;
 
@@ -42,7 +41,7 @@ public class BoardTag extends BaseTimeEntity {
 
     public void setBoard(Board board) {
         this.board = board;
-        this.board.addBoardTags(this);
+        this.board.addBoardTag(this);
     }
 
     public void setTag(Tag tag) {
