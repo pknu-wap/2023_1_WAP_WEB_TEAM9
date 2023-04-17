@@ -6,6 +6,7 @@ import com.example.demo.domain.tag.BoardTag;
 import com.example.demo.domain.tag.Tag;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
@@ -62,6 +63,13 @@ public class Board extends BaseTimeEntity {
 
         if (updateBoard.content != null) {
             this.content = updateBoard.content;
+        }
+    }
+
+    public void updateTags(List<Tag> tags) {
+        if (tags != null) {
+            this.boardTags = tags.stream()
+                .map(tag -> BoardTag.associate(this, tag)).collect(Collectors.toSet());
         }
     }
 

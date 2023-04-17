@@ -17,14 +17,14 @@ import com.example.demo.domain.member.Member;
 import com.example.demo.domain.member.Role;
 import com.example.demo.repository.BoardRepository;
 import com.example.demo.repository.MemberRepository;
-import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Value;
 
 @ExtendWith(MockitoExtension.class)
 class BoardServiceTest {
@@ -37,6 +37,9 @@ class BoardServiceTest {
     @Mock
     private MemberRepository memberRepository;
 
+    @Mock
+    private TagService tagService;
+
     private Member member;
 
     private BoardRequest request;
@@ -45,7 +48,7 @@ class BoardServiceTest {
 
     @BeforeEach
     void init() {
-        boardService = new BoardService(boardRepository);
+        boardService = new BoardService(boardRepository, tagService);
 
         member = Member.builder()
             .id(1L)
@@ -61,14 +64,17 @@ class BoardServiceTest {
             .content("This is test board")
             .title("board")
             .build();
+
         board.setMember(member);
 
         request = BoardRequest.builder()
             .content("This is test board")
             .title("board")
+            .tagNames(List.of("인생", "돈", "사랑"))
             .build();
     }
 
+    @DisplayName("게시판을 조회한다.")
     @Test
     void getBoard() {
         Long views = board.getViews();
@@ -80,11 +86,13 @@ class BoardServiceTest {
         verify(boardRepository).findBoardById(any());
     }
 
+    @DisplayName("게시판을 업데이트 한다.")
     @Test
     void update() {
         BoardRequest updateRequest = BoardRequest.builder()
             .title("hello")
             .content("updated Board")
+            .tagNames(List.of("인생", "돈"))
             .build();
         when(boardRepository.findById(any())).thenReturn(Optional.of(board));
 
@@ -94,9 +102,12 @@ class BoardServiceTest {
             () -> assertThat(board.getId()).isEqualTo(1L),
             () -> assertThat(board.getContent()).isEqualTo(updateRequest.getContent()),
             () -> assertThat(board.getTitle()).isEqualTo(updateRequest.getTitle()),
-            () -> assertThat(board.getViews()).isNotNull());
+            () -> assertThat(board.getViews()).isNotNull(),
+            () -> assertThat(board.getBoardTags()).hasSize(2)
+        );
     }
 
+    @DisplayName("주인이 아닌 사람이 게시판 업데이트를 수행하면 예외가 발생")
     @Test
     void updateNotOwner() {
         BoardRequest updateRequest = BoardRequest.builder()
@@ -104,22 +115,15 @@ class BoardServiceTest {
             .content("updated Board")
             .build();
         Member notOwner = getNotOwner();
+        Long boardId = board.getId();
 
         when(boardRepository.findById(any())).thenReturn(Optional.of(board));
 
-        assertThatThrownBy(() -> boardService.update(notOwner, board.getId(), updateRequest))
+        assertThatThrownBy(() -> boardService.update(notOwner, boardId, updateRequest))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
-    private Member getNotOwner() {
-        return Member.builder()
-            .loginId("notOwner123")
-            .password("11111111111")
-            .nickname("not Owner")
-            .id(2L)
-            .build();
-    }
-
+    @DisplayName("게시판을 등록한다.")
     @Test
     void register() {
         when(boardRepository.save(any())).thenReturn(board);
@@ -148,11 +152,21 @@ class BoardServiceTest {
     void deleteBoardNotOwned() {
         when(boardRepository.findById(any())).thenReturn(Optional.of(board));
         Member notOwner = getNotOwner();
+        Long boardId = board.getId();
 
         assertAll(
-            () -> assertThatThrownBy(() -> boardService.delete(notOwner, board.getId()))
+            () -> assertThatThrownBy(() -> boardService.delete(notOwner, boardId))
                 .isInstanceOf(IllegalArgumentException.class),
             () -> verify(boardRepository, never()).delete(any())
         );
+    }
+
+    private Member getNotOwner() {
+        return Member.builder()
+            .loginId("notOwner123")
+            .password("11111111111")
+            .nickname("not Owner")
+            .id(2L)
+            .build();
     }
 }

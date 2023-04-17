@@ -126,6 +126,26 @@ class BoardTest {
         assertThat(tagNames).contains(tag1.getName(), tag2.getName());
     }
 
+    @DisplayName("게시판의 태그를 업데이트한다.")
+    @Test
+    void updateTag() {
+        Tag tag1 = new Tag(1L, "인생");
+        Tag tag2 = new Tag(2L, "돈");
+        board.addTags(List.of(tag1, tag2));
+        Tag tag3 = new Tag(3L, "사랑");
+        Tag tag4 = new Tag(4L, "노년");
+        board.updateTags(List.of(tag3, tag4));
+
+        Set<String> tagNames = board.getBoardTags().stream()
+            .map(BoardTag::getTag)
+            .map(Tag::getName)
+            .collect(Collectors.toSet());
+        assertAll(
+            () -> assertThat(tagNames).contains(tag3.getName(), tag4.getName()),
+            () -> assertThat(tagNames).doesNotContain(tag1.getName(), tag2.getName())
+        );
+    }
+
     private static Stream<Arguments> generateBoardValues() {
         return Stream.of(
             Arguments.arguments(BoardRequest.builder()
