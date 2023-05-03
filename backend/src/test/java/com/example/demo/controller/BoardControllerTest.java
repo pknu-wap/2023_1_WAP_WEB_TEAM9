@@ -26,7 +26,6 @@ import com.example.demo.domain.member.Role;
 import com.example.demo.security.MemberDetailsService;
 import com.example.demo.service.BoardService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -99,10 +98,10 @@ class BoardControllerTest {
         mvc.perform(get("/api/board/1")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("title", board.getTitle()).exists())
-            .andExpect(jsonPath("content", board.getContent()).exists())
-            .andExpect(jsonPath("views", board.getViews()).exists())
-            .andExpect(jsonPath("memberNickname", member.getNickname()).exists())
+            .andExpect(jsonPath("title").value(board.getTitle()))
+            .andExpect(jsonPath("content").value(board.getContent()))
+            .andExpect(jsonPath("views").value(board.getViews()))
+            .andExpect(jsonPath("memberNickname").value(member.getNickname()))
             .andDo(print());
         verify(boardService).getBoard(any());
     }
@@ -116,17 +115,17 @@ class BoardControllerTest {
                 .content(objectMapper.writeValueAsString(request))
                 .with(csrf()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("title", board.getTitle()).exists())
-            .andExpect(jsonPath("content", board.getContent()).exists())
-            .andExpect(jsonPath("views", board.getViews()).exists())
-            .andExpect(jsonPath("memberNickname", member.getNickname()).exists())
+            .andExpect(jsonPath("title").value(board.getTitle()))
+            .andExpect(jsonPath("content").value(board.getContent()))
+            .andExpect(jsonPath("views").value(board.getViews()))
+            .andExpect(jsonPath("memberNickname").value(member.getNickname()))
             .andDo(print());
         verify(boardService).register(any(), any());
     }
 
     @Test
     @WithCustomMember
-    public void updateBoard() throws Exception {
+    void updateBoard() throws Exception {
         BoardRequest updateRequest = BoardRequest.builder()
             .content("updated")
             .title("")
@@ -143,7 +142,7 @@ class BoardControllerTest {
 
     @Test
     @WithCustomMember
-    public void deleteBoard() throws Exception {
+    void deleteBoard() throws Exception {
         mvc.perform(delete("/api/board/1")
                 .with(csrf()))
             .andExpect(status().isOk())
