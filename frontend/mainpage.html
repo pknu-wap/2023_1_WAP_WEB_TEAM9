@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+ 	<head>
+ 		<title>독사모</title>
+		<style>
+			input[type="text"] {
+  				width: 400px;
+  				height: 30px;
+			}
+		</style>
+		<style>
+			h2 {
+				text-align: center;
+			}
+		</style>
+		<style>
+ 			#menubar {
+ 				background : olive;
+ 			}
+ 			#menubar ul { 
+ 				margin : 0;
+ 				padding : 0;
+ 				width : 567px; 
+ 			}
+ 			#menubar ul li {
+ 				display : inline-block;
+ 				list-style-type : none; 
+ 				padding : 0px 15px;
+ 			}
+ 			#menubar ul li a {
+ 				color : white;
+ 				text-decoration : none; 
+ 			}
+ 			#menubar ul li a:hover {
+				 color : violet; 
+ 			}
+ 		</style>
+		<style>
+			body {
+				background-image: url("media/1.png (2).jpg");
+  				background-size: cover;
+				opacity: 1;
+			}
+		</style>
+		<script>
+      		function search() {
+        	var searchTerm = document.getElementById("searchTerm").value;
+        	if (searchTerm == "") {
+         	return;
+        	}
+        	var nodes = document.evaluate(
+          	"//text()[contains(translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '" +
+            	searchTerm.toLowerCase() +
+            	"')]",
+          	document,
+          	null,
+          	XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE,
+         	null
+        	);
+        	if (nodes.snapshotLength == 0) {
+          	alert("검색 결과가 없습니다.");
+          	return;
+        	}
+        	nodes.snapshotItem(0).parentNode.scrollIntoView();
+      	}
+      	document.getElementById("searchTerm").addEventListener("keypress", function (event) {
+        	if (event.keyCode === 13) {
+         	event.preventDefault();
+          	search();
+        	}
+      	});
+    	</script>
+		<script>
+      function search() {
+        var searchTerm = document.getElementById("searchTerm").value;
+        if (searchTerm == "") {
+          return;
+        }
+        var nodes = document.evaluate(
+          "//text()[contains(translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '" +
+            searchTerm.toLowerCase() +
+            "')]",
+          document,
+          null,
+          XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE,
+          null
+        );
+        if (nodes.snapshotLength == 0) {
+          alert("검색 결과가 없습니다.");
+          return;
+        }
+        nodes.snapshotItem(0).parentNode.scrollIntoView();
+      }
+    </script>
+ 		<style>
+ 			html, body { margin: 0; padding: 0; height: 100%; }
+ 			.header { width: 100%; height: 25%; }
+ 			.nav, .aside { width: 15%; height: 70%; float: left; }
+ 			.section { width: 70%; height: 70%; float: left; }
+ 			.footer { width: 100%; height: 15%; clear: both; }
+			
+ 		</style>
+		<style>
+			div.boxmain {
+				background: white;
+				border-style: solid;
+				border-color: black;
+				
+				border-width: 2px;
+				margin-right: 5%;
+				margin-left: 5%;
+			}
+			div.boxaside {
+				background: white;
+				border-style: solid;
+				border-color: black;
+				
+				border-width: 2px;
+				margin-right: 10%
+			}
+			div.boxfooter {
+				background: white;
+				border-style: solid;
+				border-color: black;
+				
+				border-width: 2px;
+				margin-bottom: 10%;
+				margin-right: 10%;
+				margin-left: 10%;
+				margin-top: 10%;
+			}
+			div.boxnav {
+				background: white;
+				border-style: solid;
+				border-color: black;
+				
+				border-width: 2px;
+				margin-left: 10%;
+			}
+		</style>
+ 	</head>
+ 	<body>
+			<header class="header">
+				<nav id="menubar">
+ 					<ul>
+ 						<li><a href="loginpage.html" target="_self">로그인</a></li>
+ 						<li><a href="#">회원가입</a></li>
+ 						<li><a href="#">메인페이지</a></li>
+ 						<li><a href="#">아무거나</a></li>
+ 						<li><a href="#">공지사항</a></li>
+ 						</ul>
+ 						</nav>	
+			<br>
+				<h2>
+					#검색 하세요 <input type="text" id="searchTerm" />
+      				<button onclick="search()" >
+						<img src = "media/2.png" height = 15px; width = 15px; >
+					</button>
+				</h2>
+			</header>
+ 			<nav class="nav">
+				<div class="boxnav">
+					뭘로할지 고민<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+				</div>
+			</nav>
+ 			<section class="section" >
+				<div class="boxmain">
+					메인게시판 <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+				</div>
+			</section>
+ 			<aside class="aside">
+				<div class="boxaside">
+					
+					마이페이지<br>
+						<ul>
+							<li> 프로필 </li>
+							<li> 관심 목록 </li>
+							<li> 내가 단 댓글 </li>
+						
+						</ul>
+					<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+					</div>
+				</aside>
+ 			<footer class="footer">
+				<div class="boxfooter">
+					
+					이달의 게시판<br><br><br><br>
+					
+				</div>
+			</footer>
+ 	</body>
+</html>
